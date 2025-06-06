@@ -1,0 +1,23 @@
+[project]
+name = "langgraphrj"
+version = "0.1.0"
+description = "Add your description here"
+requires-python = ">=3.13"
+dependencies = [
+    "colorama>=0.4.6",
+    "dotenv>=0.9.9",
+    "flask>=3.1.1",
+    "gradio>=5.32.0",
+    "langchain>=0.3.25",
+    "langgraph>=0.4.7",
+    "logging>=0.4.9.6",
+    "openai>=1.82.1",
+    "redis>=6.2.0",
+    "requests>=2.32.3",
+    "sentence-transformers>=4.1.0",
+]
+
+[dependency-groups]
+dev = [
+    "pandas>=2.2.3",
+]
