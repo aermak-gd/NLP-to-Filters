@@ -15,7 +15,7 @@ def run_flask():
         host=config.flask_host,
         port=config.flask_port,
         debug=config.flask_debug,
-        use_reloader=False
+        use_reloader=config.flask_debug
     )
 
 

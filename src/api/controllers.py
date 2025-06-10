@@ -1,16 +1,16 @@
+from flask import Blueprint, jsonify, request, current_app
 
-from flask import Flask, jsonify, request
+api_bp = Blueprint('api', __name__)
 
-@app.route('/health', methods=['GET'])
+@api_bp.route('/health', methods=['GET'])
 def health_check():
     return jsonify({"status": "healthy"}), 200
 
-
-@app.route('/api/chat', methods=['POST'])
+@api_bp.route('/api/chat', methods=['POST'])
 def chat():
     try:
         data = request.json
-        result = chat_service.process_chat_request(
+        result = current_app.chat_service.process_chat_request(
             user_query=data.get('query', ''),
             active_filters=data.get('active_filters', []),
             session_id=data.get('session_id')
@@ -25,5 +25,5 @@ def chat():
             "message": "Sorry, I encountered an error processing your request."
         }), 500
 
-
-return app
+def register_routes(app):
+    app.register_blueprint(api_bp)

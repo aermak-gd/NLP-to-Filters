@@ -1,7 +1,7 @@
 from langgraph.graph import StateGraph, END
 
 from src.models.domain_models import FilterState
-from nodes import GraphNodes
+from src.services.nodes import GraphNodes
 
 class NLP2FiltersGraph:
     def __init__(self, nodes: GraphNodes):
