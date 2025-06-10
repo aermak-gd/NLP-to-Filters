@@ -3,11 +3,8 @@ services:
     build: .
     ports:
       - "5001:5001"
-    environment:
-      - FLASK_HOST=0.0.0.0
-      - FLASK_PORT=5001
-      - FLASK_DEBUG=true
-      - OPENAI_API_KEY=${OPENAI_API_KEY}
+    env_file:
+      - .env
     volumes:
       - .:/app
     command: python run.py --mode api-only
