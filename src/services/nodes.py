@@ -114,7 +114,7 @@ class GraphNodes:
 
         embeddings = self.embedding_service.embed_batch(concept_texts)
 
-        batch_results = self.redis_store.search_filters_batch(
+        batch_results = self.vector_store.search_filters_batch(
             embeddings,
             top_k=2,
             score_threshold=0.3

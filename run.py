@@ -7,15 +7,19 @@ from src.ui.console_app import run_console_app
 from config.settings import FlaskConfig
 
 
-def run_flask():
+def run_flask(use_reloader=None):
     """Run Flask app"""
     config = FlaskConfig()
+    
+    # If use_reloader is not specified, use config value
+    if use_reloader is None:
+        use_reloader = config.flask_debug
 
     app.run(
         host=config.flask_host,
         port=config.flask_port,
         debug=config.flask_debug,
-        use_reloader=config.flask_debug
+        use_reloader=use_reloader
     )
 
 
@@ -47,9 +51,16 @@ def main():
 
     args = parser.parse_args()
 
-    # Always start Flask API except in 'console' mode where it will be started anyway below
-    if args.mode in ['both', 'gradio', 'api-only']:
-        flask_thread = threading.Thread(target=run_flask)
+    if args.mode == 'api-only':
+        print("Starting Flask API...")
+        print(f"Flask API running at: http://localhost:{config.flask_port}")
+        print("Press Ctrl+C to stop")
+        # Run Flask in main thread with reloader enabled
+        run_flask()
+        
+    elif args.mode in ['both', 'gradio']:
+        # Start Flask in separate thread
+        flask_thread = threading.Thread(target=lambda: run_flask(use_reloader=False))
         flask_thread.daemon = True
         flask_thread.start()
 
@@ -57,8 +68,21 @@ def main():
         time.sleep(2)
         print(f"Flask API running at: http://localhost:{config.flask_port}")
 
-    if args.mode == 'console':
-        flask_thread = threading.Thread(target=run_flask)
+        if args.mode == 'gradio':
+            print("Starting Gradio UI...")
+            print(f"Gradio UI will be available at: http://localhost:7860")
+            # run_gradio()
+        elif args.mode == 'both':
+            print("Both services started")
+            try:
+                while True:
+                    time.sleep(1)
+            except KeyboardInterrupt:
+                print("\nShutting down...")
+
+    elif args.mode == 'console':
+        # Start Flask in separate thread
+        flask_thread = threading.Thread(target=lambda: run_flask(use_reloader=False))
         flask_thread.daemon = True
         flask_thread.start()
 
@@ -68,32 +92,6 @@ def main():
 
         print("Starting Console Interface...")
         run_console_app(args.api_url)
-
-    elif args.mode == 'gradio':
-        print("Starting Gradio UI...")
-        print(f"Gradio UI will be available at: http://localhost:7860")
-        # run_gradio()
-
-    # elif args.mode == 'both':
-    #     gradio_thread = threading.Thread(target=run_gradio)
-    #     gradio_thread.daemon = True
-    #     gradio_thread.start()
-    #
-    #     print("Starting Gradio UI in background...")
-    #     print(f"Gradio UI available at: http://localhost:7860")
-    #     time.sleep(2)
-    #
-    #     print("\nStarting Console Interface...")
-    #     run_console_app()
-
-    elif args.mode == 'api-only':
-        print("Running API only mode...")
-        print("Press Ctrl+C to stop")
-        try:
-            while True:
-                time.sleep(1)
-        except KeyboardInterrupt:
-            print("\nShutting down...")
 
 if __name__ == "__main__":
     main()
