@@ -19,11 +19,11 @@ class EmbeddingConfig:
     embedding_dimension: int = 384
 
 class RedisConfig:
-    redis_host: str = "localhost"
-    redis_port: int = 6379
+    redis_host: str = os.getenv("REDIS_HOST", "redis")
+    redis_port: int = int(os.getenv("REDIS_PORT", "6379"))
     redis_password: Optional[str] = os.getenv("REDIS_PASSWORD")
-    redis_db: int = 0
-    redis_index_name: str = "filter_index"
+    redis_db: int = int(os.getenv("REDIS_DB", "0"))
+    redis_index_name: str = os.getenv("REDIS_INDEX_NAME", "filter_index")
     redis_embedding_dimension: int = EmbeddingConfig.embedding_dimension
 
 class FlaskConfig:
