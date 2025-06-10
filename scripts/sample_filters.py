@@ -50,7 +50,7 @@ SAMPLE_FILTERS = [
         "controlType": "TEXT_INPUT",
         "operators": ["EQUALS"],
         "category": "Client Identification",
-        "description": "Social Security Number of the client. Access to this filter should be highly restricted and logged due to its sensitive nature.",
+        "description": "Additional Social Security Number of the client. Access to this filter should be highly restricted and logged due to its sensitive nature.",
         "keywords": ["SSN", "social security", "identification", "tax ID"]
     },
     {
@@ -106,5 +106,14 @@ SAMPLE_FILTERS = [
         "category": "Investment",
         "description": "Client's risk tolerance for investments",
         "keywords": ["risk", "tolerance", "conservative", "aggressive", "moderate"]
-    }
+    },
+    {
+        "displayName": "Phone Number",
+        "type": "STRING",
+        "controlType": "TEXT_INPUT",
+        "operators": ["EQUALS"],
+        "category": "Client",
+        "description": "Phone Number of the client",
+        "keywords": ["Phone Number", "Telephone"]
+    },
 ]

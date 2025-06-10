@@ -1,7 +1,7 @@
 import threading
 import argparse
 import time
-from src.app import app
+from src.api.app import app
 # from src.ui.gradio_app import gradio_app
 from src.ui.console_app import run_console_app
 from config.settings import FlaskConfig

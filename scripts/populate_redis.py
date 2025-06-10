@@ -2,8 +2,8 @@ from typing import List, Dict, Any
 import time
 import logging
 
-from src.services.redis_service import redis_store
-from src.services.embedding_service import embedding_service
+from src.infrastructure.redis_client import redis_store
+from src.infrastructure.embedding_client import embedding_service
 from scripts.sample_filters import SAMPLE_FILTERS
 
 logging.basicConfig(level=logging.INFO)

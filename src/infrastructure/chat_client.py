@@ -1,9 +1,8 @@
 from typing import List
-from dataclasses import asdict
 import uuid
 
-from src.core.workflow import create_workflow
-from src.core.models import ActiveFilter
+from src.services.workflow import create_workflow
+from src.models.domain_models import ActiveFilter
 
 
 

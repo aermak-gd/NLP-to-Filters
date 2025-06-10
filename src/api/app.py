@@ -1,6 +1,6 @@
 import logging
 from flask import Flask, jsonify, request
-from src.services.chat_service import ChatService
+from src.infrastructure.chat_client import ChatService
 
 def create_app():
     app = Flask(__name__)

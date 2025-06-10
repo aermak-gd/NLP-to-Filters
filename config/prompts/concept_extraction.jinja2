@@ -25,8 +25,7 @@ Below are the available categories and their descriptions:
 Instructions:
 
 Given a list of active filters and user's search query, extract **each distinct search criterion with desired action** (for filtering) you can identify in user's query.
-Don't be surprised to find masked PIIs in the query. It can be name, SSN, email, phone number, or other PII. You should extract concepts for them anyway.
-For each concept add a short description that will be used together with text field to generate concept embedding. Don't repeat content of text field in these descriptions. Des
+For each concept add a short description that will be used together with text field to generate concept embedding. Don't repeat content of text field in these descriptions.
 
 For each, return an object with:
   - **text**: The exact phrase or clause from the user query describing the criterion.
@@ -35,7 +34,7 @@ For each, return an object with:
   - **action**: One of the following:
     - **add**: New filter to be added
     - **drop**: Existing filter to be removed
-    - **modify**: Existing filter to be changed
+  - **filter_name** (if drop action): list filter_name from active_filters that should be removed
 
 
 Output a JSON array only. Do not include any additional explanation or comments.
@@ -66,6 +65,7 @@ Output:
   {
     "text": "age filter",
     "action": "drop",
+    "filter_name": "age""
     "category": "Client"
   },
   {
@@ -77,7 +77,7 @@ Output:
 Do NOT output explanations, comments, or any text outside of the valid JSON array.
 
 {% if current_filters %}
-Current Active Filters (user wants to ADD to or MODIFY these):
+Current Active Filters (user wants to ADD to or DROP these):
 {% for filter in current_filters %}
 - {{ filter.filter_name }}: {{ filter.operator }} {{ filter.value }}
 {% endfor %}

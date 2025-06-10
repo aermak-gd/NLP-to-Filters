@@ -7,8 +7,9 @@ class ExtractedConcept:
     """What the LLM extracts from user query"""
     text: str  # "age > 59"
     generated_keywords: List[str]
-    action: str = "add"  # add, drop, modify
-    category: Optional[str] = None  # optional hint from LLM
+    action: str # add, drop, modify
+    filter_name: Optional[str] = None
+    category: Optional[str] = None
 
 @dataclass
 class FilterMatch:
@@ -17,6 +18,7 @@ class FilterMatch:
     filter_name: str
     operators: List[str]
     options: List[str]
+    description: str
     confidence: float  # From RAG similarity
     matched_concept: str  # Which concept matched this
 
@@ -25,6 +27,7 @@ class ActiveFilter:
     """A filter ready to be applied"""
     filter_id: str
     filter_name: str
+    description: str
     operator: str  # From filter metadata, not enum
     value: Any
 

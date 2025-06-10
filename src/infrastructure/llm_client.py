@@ -9,15 +9,15 @@ class LLMService:
     def __init__(self, config=LLMConfig):
         self.client = OpenAI(api_key=config.api_key)
         self.model = config.llm_model
-        self.max_retries = 3
-        self.retry_delay = 1
+        self.temperature = config.temperature
+        self.max_tokens = config.max_tokens
+        self.max_retries = config.max_retries
+        self.retry_delay = config.max_delay
 
     def generate_completion(self,
                             system_prompt: str,
                             user_prompt: str,
-                            temperature: float = 0.1,
-                            json_mode: bool = True,
-                            max_tokens: int = 3000) -> str:
+                            json_mode: bool = True) -> str:
         """Generate completion using OpenAI API with retry logic"""
 
         messages = [
@@ -28,8 +28,8 @@ class LLMService:
         kwargs = {
             "model": self.model,
             "messages": messages,
-            "temperature": temperature,
-            "max_tokens": max_tokens
+            "temperature": self.temperature,
+            "max_tokens": self.max_tokens
         }
 
 
