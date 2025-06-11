@@ -9,7 +9,6 @@ class LLMConfig:
     model: str = "gpt-4o-mini"
     temperature: float = 0.1
     max_tokens: int = 3000
-    llm_model: str = "gpt-4o-mini"
     api_key: str = os.getenv("OPENAI_API_KEY")
     max_retries: int = 3
     max_delay: int = 1

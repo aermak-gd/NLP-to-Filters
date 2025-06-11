@@ -8,7 +8,7 @@ import time
 class LLMService:
     def __init__(self, config=LLMConfig):
         self.client = OpenAI(api_key=config.api_key)
-        self.model = config.llm_model
+        self.model = config.model
         self.temperature = config.temperature
         self.max_tokens = config.max_tokens
         self.max_retries = config.max_retries

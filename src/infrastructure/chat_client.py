@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Dict
 import uuid
 
 from src.services.workflow import create_workflow
@@ -10,12 +10,12 @@ class ChatService:
     def __init__(self):
         self.workflow = create_workflow()
 
-    def process_chat_request(self, user_query: str, active_filters: List[ActiveFilter], session_id: str = None):
+    def process_chat_request(self, user_query: str, active_filters: List[Dict], session_id: str = None):
         session_id = session_id or str(uuid.uuid4())
 
         initial_state = {
             "query": user_query,
-            "active_filters": active_filters,
+            "active_filters": [ActiveFilter(**af) for af in active_filters],
             "clarification_request": [],
             "concepts": [],
             "matched_filters": [],

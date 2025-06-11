@@ -29,10 +29,10 @@ For each concept add a short description that will be used together with text fi
 
 For each, return an object with:
   - **text**: The exact phrase or clause from the user query describing the criterion.
-  - **generated_keywords**: An array of synonyms, paraphrases, or keywords that describe the criterion (do not repeat raw_text). Don't use masked values of the form PII_MASK_* to generate values.
+  - **generated_keywords** (optional): An array of synonyms, paraphrases, or keywords that describe the criterion (do not repeat text field). You should omit this field if the concept matches one of active filters.
   - **category** (optional): One of the categories listed above, if you are certain it applies.
   - **action**: One of the following:
-    - **add**: New filter to be added
+    - **add**: New filter to be added (default)
     - **drop**: Existing filter to be removed
   - **filter_name** (if drop action): list filter_name from active_filters that should be removed
 

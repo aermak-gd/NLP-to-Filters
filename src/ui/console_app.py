@@ -4,6 +4,8 @@ from typing import List, Dict, Any, Optional
 from colorama import init, Fore, Style
 import textwrap
 
+from src.models.domain_models import ActiveFilter
+
 init()
 
 mock_suggestions = {'concept_text': 'Washington', 'options': [
@@ -100,12 +102,12 @@ class ConsoleFilterAssistant:
 
         selected_option = all_options[selection - 1]
 
-        new_filter = {
-            'filter_id': selected_option['filter_id'],
-            'filter_name': selected_option['filter_name'],
-            'operator': selected_option['operator'],
-            'value': selected_option['value']
-        }
+        new_filter = ActiveFilter(
+            filter_id=selected_option['filter_id'],
+            filter_name=selected_option['filter_name'],
+            operator=selected_option['operator'],
+            value=selected_option['value']
+        )
         self.active_filters.append(new_filter)
 
         display_text = f"{selected_option['filter_name']} {selected_option['operator']} '{selected_option['value']}'"

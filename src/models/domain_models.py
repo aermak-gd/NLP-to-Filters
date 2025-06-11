@@ -6,8 +6,8 @@ from datetime import datetime
 class ExtractedConcept:
     """What the LLM extracts from user query"""
     text: str  # "age > 59"
-    generated_keywords: List[str]
     action: str # add, drop, modify
+    generated_keywords: Optional[List[str]] = None
     filter_name: Optional[str] = None
     category: Optional[str] = None
 
@@ -43,7 +43,7 @@ class FilterState:
     query: str
     active_filters: List[ActiveFilter]
     # clarification_response: List[Dict[str, Any]] # Append to active_filters on Front
-    pii_mappings: Dict[str, str]
+    # pii_mappings: Dict[str, str]
     concepts: List[ExtractedConcept]
     matched_filters: List[FilterMatch]
     clarification_request: List[FilterSuggestion]
