@@ -9,3 +9,12 @@ http://localhost:5001/redis/health
 
 http://localhost:8001/ 
 
+```sh
+
+docker compose build
+
+docker compose up -d
+
+docker compose exec app python -m scripts.populate_redis
+
+```
