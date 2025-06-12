@@ -17,4 +17,25 @@ docker compose up -d
 
 docker compose exec app python -m scripts.populate_redis
 
+
+
+# Запуск
+docker compose up -d
+
+# Остановка (БЕЗ удаления volumes)
+docker compose down
+
+# Перезапуск
+docker compose restart
+
+# Просмотр логов
+docker compose logs redis
+
+docker compose logs app
+
+# Выполнение команд в контейнерах
+docker compose exec app python -m scripts.populate_redis
+
+docker compose exec redis redis-cli keys "*"
+
 ```
