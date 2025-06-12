@@ -73,6 +73,6 @@ def test_search():
 
 if __name__ == "__main__":
     initialize_vector_db(SAMPLE_FILTERS)
-    # Принудительно сохранить данные на диск
+    # Force save data to disk
     redis_store.redis_client.save()
     logger.info("Data saved to disk")

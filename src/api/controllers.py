@@ -10,22 +10,22 @@ def health_check():
 @api_bp.route('/redis/health', methods=['GET'])
 def redis_health_check():
     try:
-        # Базовая проверка соединения
+        # Basic connection check
         redis_store.redis_client.ping()
         info = redis_store.redis_client.info()
         key_count = len(redis_store.redis_client.keys('*'))
         
-        # Информация об индексе
+        # Index information
         index_info = {}
         filter_documents = []
         sample_documents = []
         
         try:
-            # Получаем информацию об индексе
+            # Get index information
             index = redis_store.redis_client.ft(redis_store.config.redis_index_name)
             index_info = index.info()
             
-            # Получаем документы фильтров
+            # Get filter documents
             from redis.commands.search.query import Query
             query = Query("*").return_fields("text", "metadata").paging(0, 100)
             results = index.search(query)
@@ -33,7 +33,7 @@ def redis_health_check():
             if hasattr(results, 'docs') and results.docs:
                 for doc in results.docs:
                     try:
-                        # Парсим метаданные
+                        # Parse metadata
                         metadata_str = getattr(doc, 'metadata', '{}')
                         if isinstance(metadata_str, bytes):
                             metadata_str = metadata_str.decode('utf-8')
@@ -54,10 +54,10 @@ def redis_health_check():
                     except Exception as e:
                         continue
                 
-                # Берем первые 3 документа как примеры
+                # Take first 3 documents as examples
                 sample_documents = filter_documents[:3]
                 
-            # Статистика по категориям
+            # Statistics by categories
             categories = {}
             control_types = {}
             for doc in filter_documents:
