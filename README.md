@@ -13,11 +13,6 @@ http://localhost:8001/
 
 docker compose build
 
-docker compose up -d
-
-docker compose exec app python -m scripts.populate_redis
-
-
 
 # Запуск
 docker compose up -d
@@ -32,6 +27,22 @@ docker compose restart
 docker compose logs redis
 
 docker compose logs app
+
+
+
+# Просмотр логов в реальном времени
+# Для выхода из режима просмотра логов Ctrl+C.
+
+docker compose logs -f redis
+
+docker compose logs -f app
+
+# Логи всех сервисов в реальном времени
+docker compose logs -f
+
+# Последние 50 строк + реальное время
+docker compose logs -f --tail=50 app
+
 
 # Выполнение команд в контейнерах
 docker compose exec app python -m scripts.populate_redis
