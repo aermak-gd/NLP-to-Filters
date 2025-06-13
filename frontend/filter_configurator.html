@@ -28,6 +28,55 @@
             backdrop-filter: blur(10px);
         }
 
+        .query-section {
+            margin-bottom: 30px;
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .query-input {
+            flex: 1;
+            padding: 15px;
+            border: 2px solid #e2e8f0;
+            border-radius: 10px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            background: #f7fafc;
+        }
+
+        .query-input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+            background: white;
+        }
+
+        .query-submit {
+            padding: 15px 30px;
+            border: none;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+        }
+
+        .query-submit:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.3);
+        }
+
+        .query-submit:disabled {
+            background: #e2e8f0;
+            color: #a0aec0;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
         h1 {
             text-align: center;
             color: #2d3748;
@@ -309,6 +358,11 @@
 <body>
     <div class="container">
         <h1>Filter Configuration Dashboard</h1>
+        
+        <div class="query-section">
+            <input type="text" class="query-input" id="queryInput" placeholder="Enter your query (e.g., 'show me clients under 50')...">
+            <button class="query-submit" id="querySubmit" onclick="sendQuery()">Send Query</button>
+        </div>
         
         <div class="filters-grid" id="filtersContainer">
             <!-- Filters will be dynamically generated here -->
@@ -884,6 +938,67 @@
 
         function getAllFilterNames() {
             return SAMPLE_FILTERS.map(filter => filter.displayName);
+        }
+
+        async function sendQuery() {
+            const queryInput = document.getElementById('queryInput');
+            const submitButton = document.getElementById('querySubmit');
+            const query = queryInput.value.trim();
+
+            if (!query) {
+                alert('Please enter a query');
+                return;
+            }
+
+            // Disable the submit button while processing
+            submitButton.disabled = true;
+            submitButton.textContent = 'Processing...';
+
+            try {
+                const activeFilters = getFilterValues();
+                const response = await fetch('http://localhost:5001/api/chat', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        query: query,
+                        active_filters: activeFilters,
+                        session_id: "123"
+                    })
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                const data = await response.json();
+                
+                // Clear all existing filters first
+                clearFilters();
+                
+                // Apply the new filters from the response
+                if (data.active_filters && data.active_filters.length > 0) {
+                    data.active_filters.forEach(filter => {
+                        setFilterValue(filter.filter_name, filter.value, filter.operator);
+                    });
+                }
+
+                // Show the message from the response
+                const resultsDiv = document.getElementById('results');
+                const resultsContent = document.getElementById('resultsContent');
+                resultsContent.textContent = data.message;
+                resultsDiv.style.display = 'block';
+                resultsDiv.scrollIntoView({ behavior: 'smooth' });
+
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Error processing query: ' + error.message);
+            } finally {
+                // Re-enable the submit button
+                submitButton.disabled = false;
+                submitButton.textContent = 'Send Query';
+            }
         }
 
         // Make functions globally available

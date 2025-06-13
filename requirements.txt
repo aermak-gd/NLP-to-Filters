@@ -13,6 +13,7 @@ fastapi==0.115.12
 ffmpy==0.6.0
 filelock==3.18.0
 flask==3.1.1
+flask-cors==6.0.1
 fsspec==2025.5.1
 gradio==5.33.1
 gradio-client==1.10.3
