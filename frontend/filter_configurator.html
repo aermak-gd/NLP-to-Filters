@@ -1,0 +1,914 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Filter Configuration Interface</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+            backdrop-filter: blur(10px);
+        }
+
+        h1 {
+            text-align: center;
+            color: #2d3748;
+            margin-bottom: 30px;
+            font-size: 2.5rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .filters-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+
+        .filter-card {
+            background: #ffffff;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(102, 126, 234, 0.1);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .filter-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+        }
+
+        .filter-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15);
+        }
+
+        .filter-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 20px;
+        }
+
+        .filter-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #2d3748;
+            margin-bottom: 5px;
+        }
+
+        .filter-category {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+
+        .filter-description {
+            color: #718096;
+            font-size: 0.9rem;
+            margin-bottom: 20px;
+            line-height: 1.4;
+        }
+
+        .filter-controls {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .control-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .control-label {
+            font-weight: 500;
+            color: #4a5568;
+            font-size: 0.9rem;
+        }
+
+        .control-input {
+            padding: 12px 15px;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            background: #f7fafc;
+        }
+
+        .control-input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+            background: white;
+        }
+
+        .checkbox-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .checkbox-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 12px;
+            background: #f7fafc;
+            border-radius: 8px;
+            border: 2px solid transparent;
+            transition: all 0.3s ease;
+        }
+
+        .checkbox-item:hover {
+            background: #edf2f7;
+        }
+
+        .checkbox-item input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            accent-color: #667eea;
+        }
+
+        .checkbox-item input[type="checkbox"]:checked + label {
+            color: #667eea;
+            font-weight: 500;
+        }
+
+        .checkbox-item label {
+            font-size: 0.9rem;
+            color: #4a5568;
+            cursor: pointer;
+        }
+
+        .operator-select {
+            padding: 12px 15px;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 1rem;
+            background: #f7fafc;
+            color: #4a5568;
+            transition: all 0.3s ease;
+        }
+
+        .operator-select:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+            background: white;
+        }
+
+        .date-range {
+            display: flex;
+            gap: 5px;
+            align-items: center;
+        }
+
+        .date-range input {
+            flex: 1;
+            max-width: 150px;
+            padding: 8px 10px;
+        }
+
+        .number-range {
+            display: flex;
+            gap: 5px;
+            align-items: center;
+        }
+
+        .number-range input {
+            flex: 1;
+            max-width: 120px;
+            padding: 8px 10px;
+        }
+
+        .range-separator {
+            color: #718096;
+            font-weight: 500;
+            padding: 0 5px;
+        }
+
+        .actions {
+            text-align: center;
+            margin-top: 30px;
+        }
+
+        .btn {
+            padding: 15px 30px;
+            border: none;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin: 0 10px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn-secondary {
+            background: #e2e8f0;
+            color: #4a5568;
+        }
+
+        .btn-secondary:hover {
+            background: #cbd5e0;
+            transform: translateY(-2px);
+        }
+
+        .results {
+            margin-top: 30px;
+            padding: 20px;
+            background: #f7fafc;
+            border-radius: 10px;
+            border-left: 4px solid #667eea;
+        }
+
+        .results h3 {
+            color: #2d3748;
+            margin-bottom: 15px;
+        }
+
+        .results pre {
+            background: #2d3748;
+            color: #e2e8f0;
+            padding: 15px;
+            border-radius: 8px;
+            overflow-x: auto;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+        }
+
+        .sensitive-warning {
+            background: #fed7d7;
+            color: #c53030;
+            padding: 10px;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            margin-top: 10px;
+            border-left: 3px solid #f56565;
+        }
+
+        @media (max-width: 768px) {
+            .filters-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .container {
+                padding: 20px;
+            }
+            
+            h1 {
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Filter Configuration Dashboard</h1>
+        
+        <div class="filters-grid" id="filtersContainer">
+            <!-- Filters will be dynamically generated here -->
+        </div>
+        
+        <div class="actions">
+            <button class="btn btn-primary" onclick="applyFilters()">Apply Filters</button>
+            <button class="btn btn-secondary" onclick="clearFilters()">Clear All</button>
+            <button class="btn btn-secondary" onclick="exportConfig()">Export Config</button>
+        </div>
+        
+        <div class="results" id="results" style="display: none;">
+            <h3>Applied Filters Configuration</h3>
+            <pre id="resultsContent"></pre>
+        </div>
+    </div>
+
+    <script>
+        const SAMPLE_FILTERS = [
+            {
+                "displayName": "Client First Name",
+                "type": "STRING",
+                "controlType": "TEXT_INPUT",
+                "operators": ["EQUALS", "CONTAINS", "STARTS_WITH", "ENDS_WITH"],
+                "category": "Client",
+                "description": "First Name of the client",
+                "keywords": ["name", "client name", "first name"]
+            },
+            {
+                "displayName": "Client Family Name",
+                "type": "STRING",
+                "controlType": "TEXT_INPUT",
+                "operators": ["EQUALS", "CONTAINS", "STARTS_WITH", "ENDS_WITH"],
+                "category": "Client",
+                "description": "Family name of the client",
+                "keywords": ["last name", "full name"]
+            },
+            {
+                "displayName": "Client Email",
+                "type": "STRING",
+                "controlType": "TEXT_INPUT",
+                "operators": ["EQUALS", "CONTAINS", "STARTS_WITH", "ENDS_WITH"],
+                "category": "Contact Information",
+                "description": "Email address of the client",
+                "keywords": ["email", "contact", "email address", "mail"]
+            },
+            {
+                "displayName": "Account Number",
+                "type": "STRING",
+                "controlType": "TEXT_INPUT",
+                "operators": ["EQUALS", "STARTS_WITH", "CONTAINS"],
+                "category": "Account",
+                "description": "Unique identifier for the client's account",
+                "keywords": ["account", "account ID", "number", "account number", "reference"]
+            },
+            {
+                "displayName": "Social Security Number (SSN)",
+                "type": "STRING",
+                "controlType": "TEXT_INPUT",
+                "operators": ["EQUALS"],
+                "category": "Client Identification",
+                "description": "Social Security Number of the client. Access to this filter should be highly restricted and logged due to its sensitive nature.",
+                "keywords": ["SSN", "social security", "identification", "tax ID"]
+            },
+            {
+                "displayName": "Social Security Number (SSN) 2",
+                "type": "STRING",
+                "controlType": "TEXT_INPUT",
+                "operators": ["EQUALS"],
+                "category": "Client Identification",
+                "description": "Additional Social Security Number of the client. Access to this filter should be highly restricted and logged due to its sensitive nature.",
+                "keywords": ["SSN", "social security", "identification", "tax ID"]
+            },
+            {
+                "displayName": "Client Age",
+                "type": "NUMBER",
+                "controlType": "NUMBER_RANGE",
+                "operators": ["GREATER_THAN", "LESS_THAN", "EQUALS", "BETWEEN"],
+                "category": "Client",
+                "description": "Age of the client",
+                "keywords": ["age", "years old", "older", "younger"]
+            },
+            {
+                "displayName": "Marital Status",
+                "type": "STRING",
+                "controlType": "CHECKBOX",
+                "options": ["Single", "Married", "Divorced", "Widowed"],
+                "category": "Client",
+                "description": "Marital status of the client",
+                "keywords": ["married", "single", "divorced", "widowed", "marital"]
+            },
+            {
+                "displayName": "Last Contact Date",
+                "type": "DATE",
+                "controlType": "DATE_RANGE",
+                "operators": ["WITHIN", "NOT_WITHIN", "EQUALS", "GREATER_THAN", "LESS_THAN"],
+                "category": "CRM Activities",
+                "description": "Date of last contact with client",
+                "keywords": ["contact", "last contacted", "communication", "outreach"]
+            },
+            {
+                "displayName": "Account Balance",
+                "type": "NUMBER",
+                "controlType": "NUMBER_RANGE",
+                "operators": ["GREATER_THAN", "LESS_THAN", "EQUALS", "BETWEEN"],
+                "category": "Account",
+                "description": "Current account balance",
+                "keywords": ["balance", "account value", "portfolio value", "assets"]
+            },
+            {
+                "displayName": "Income Level",
+                "type": "NUMBER",
+                "controlType": "NUMBER_RANGE",
+                "operators": ["GREATER_THAN", "LESS_THAN", "EQUALS", "BETWEEN"],
+                "category": "Client",
+                "description": "Annual income of the client",
+                "keywords": ["income", "salary", "earnings", "annual income"]
+            },
+            {
+                "displayName": "Investment Risk Tolerance",
+                "type": "STRING",
+                "controlType": "CHECKBOX",
+                "options": ["Conservative", "Moderate", "Aggressive"],
+                "category": "Investment",
+                "description": "Client's risk tolerance for investments",
+                "keywords": ["risk", "tolerance", "conservative", "aggressive", "moderate"]
+            },
+            {
+                "displayName": "Phone Number",
+                "type": "STRING",
+                "controlType": "TEXT_INPUT",
+                "operators": ["EQUALS"],
+                "category": "Client",
+                "description": "Phone Number of the client",
+                "keywords": ["Phone Number", "Telephone"]
+            }
+        ];
+
+        function createFilterCard(filter, index) {
+            const isSensitive = filter.displayName.includes('SSN');
+            const sensitiveWarning = isSensitive ? 
+                `<div class="sensitive-warning">⚠️ Sensitive Information: This filter contains personally identifiable information and should be handled with extreme care.</div>` : '';
+
+            let controlsHTML = '';
+            
+            // Add operator selection if multiple operators are available
+            if (filter.operators && filter.operators.length > 1) {
+                controlsHTML += `
+                    <div class="control-group">
+                        <label class="control-label">Operator</label>
+                        <select class="operator-select" id="operator_${index}">
+                            ${filter.operators.map(op => `<option value="${op}">${op.replace('_', ' ')}</option>`).join('')}
+                        </select>
+                    </div>
+                `;
+            }
+
+            // Add appropriate input controls based on controlType
+            switch (filter.controlType) {
+                case 'TEXT_INPUT':
+                    controlsHTML += `
+                        <div class="control-group">
+                            <label class="control-label">Value</label>
+                            <input type="text" class="control-input" id="value_${index}" placeholder="Enter ${filter.displayName.toLowerCase()}...">
+                        </div>
+                    `;
+                    break;
+                
+                case 'NUMBER_RANGE':
+                    controlsHTML += `
+                        <div class="control-group">
+                            <label class="control-label">Number Range</label>
+                            <div class="number-range">
+                                <input type="number" class="control-input" id="min_${index}" placeholder="Min">
+                                <span class="range-separator">to</span>
+                                <input type="number" class="control-input" id="max_${index}" placeholder="Max">
+                            </div>
+                        </div>
+                    `;
+                    break;
+                
+                case 'DATE_RANGE':
+                    controlsHTML += `
+                        <div class="control-group">
+                            <label class="control-label">Date Range</label>
+                            <div class="date-range">
+                                <input type="date" class="control-input" id="start_date_${index}">
+                                <span class="range-separator">to</span>
+                                <input type="date" class="control-input" id="end_date_${index}">
+                            </div>
+                        </div>
+                    `;
+                    break;
+                
+                case 'CHECKBOX':
+                    if (filter.options) {
+                        controlsHTML += `
+                            <div class="control-group">
+                                <label class="control-label">Select Options</label>
+                                <div class="checkbox-group">
+                                    ${filter.options.map(option => `
+                                        <div class="checkbox-item">
+                                            <input type="checkbox" id="option_${index}_${option}" value="${option}">
+                                            <label for="option_${index}_${option}">${option}</label>
+                                        </div>
+                                    `).join('')}
+                                </div>
+                            </div>
+                        `;
+                    }
+                    break;
+            }
+
+            return `
+                <div class="filter-card" data-filter-index="${index}">
+                    <div class="filter-header">
+                        <div>
+                            <div class="filter-title">${filter.displayName}</div>
+                            <div class="filter-category">${filter.category}</div>
+                        </div>
+                    </div>
+                    <div class="filter-description">${filter.description}</div>
+                    <div class="filter-controls">
+                        ${controlsHTML}
+                    </div>
+                    ${sensitiveWarning}
+                </div>
+            `;
+        }
+
+        function renderFilters() {
+            const container = document.getElementById('filtersContainer');
+            container.innerHTML = SAMPLE_FILTERS.map((filter, index) => createFilterCard(filter, index)).join('');
+        }
+
+        function getFilterValues() {
+            const activeFilters = [];
+            
+            SAMPLE_FILTERS.forEach((filter, index) => {
+                const filterData = {
+                    displayName: filter.displayName,
+                    type: filter.type,
+                    controlType: filter.controlType,
+                    category: filter.category
+                };
+
+                // Get operator
+                const operatorElement = document.getElementById(`operator_${index}`);
+                if (operatorElement) {
+                    filterData.operator = operatorElement.value;
+                }
+
+                // Get values based on control type
+                let hasValue = false;
+                
+                switch (filter.controlType) {
+                    case 'TEXT_INPUT':
+                        const textValue = document.getElementById(`value_${index}`).value.trim();
+                        if (textValue) {
+                            filterData.value = textValue;
+                            hasValue = true;
+                        }
+                        break;
+                    
+                    case 'NUMBER_RANGE':
+                        const minValue = document.getElementById(`min_${index}`).value;
+                        const maxValue = document.getElementById(`max_${index}`).value;
+                        if (minValue || maxValue) {
+                            filterData.range = {
+                                min: minValue ? parseFloat(minValue) : null,
+                                max: maxValue ? parseFloat(maxValue) : null
+                            };
+                            hasValue = true;
+                        }
+                        break;
+                    
+                    case 'DATE_RANGE':
+                        const startDate = document.getElementById(`start_date_${index}`).value;
+                        const endDate = document.getElementById(`end_date_${index}`).value;
+                        if (startDate || endDate) {
+                            filterData.dateRange = {
+                                start: startDate || null,
+                                end: endDate || null
+                            };
+                            hasValue = true;
+                        }
+                        break;
+                    
+                    case 'CHECKBOX':
+                        if (filter.options) {
+                            const selected = [];
+                            filter.options.forEach(option => {
+                                const checkbox = document.getElementById(`option_${index}_${option}`);
+                                if (checkbox && checkbox.checked) {
+                                    selected.push(option);
+                                }
+                            });
+                            if (selected.length > 0) {
+                                filterData.selectedOptions = selected;
+                                hasValue = true;
+                            }
+                        }
+                        break;
+                }
+
+                if (hasValue) {
+                    activeFilters.push(filterData);
+                }
+            });
+
+            return activeFilters;
+        }
+
+        function applyFilters() {
+            const activeFilters = getFilterValues();
+            
+            if (activeFilters.length === 0) {
+                alert('Please configure at least one filter before applying.');
+                return;
+            }
+
+            const resultsDiv = document.getElementById('results');
+            const resultsContent = document.getElementById('resultsContent');
+            
+            resultsContent.textContent = JSON.stringify(activeFilters, null, 2);
+            resultsDiv.style.display = 'block';
+            
+            // Smooth scroll to results
+            resultsDiv.scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function clearFilters() {
+            // Clear all form inputs
+            document.querySelectorAll('.control-input').forEach(input => {
+                input.value = '';
+            });
+            
+            document.querySelectorAll('input[type="checkbox"]').forEach(checkbox => {
+                checkbox.checked = false;
+            });
+            
+            document.querySelectorAll('.operator-select').forEach(select => {
+                select.selectedIndex = 0;
+            });
+            
+            // Hide results
+            document.getElementById('results').style.display = 'none';
+        }
+
+        function exportConfig() {
+            const activeFilters = getFilterValues();
+            
+            if (activeFilters.length === 0) {
+                alert('No filters configured to export.');
+                return;
+            }
+
+            const dataStr = JSON.stringify(activeFilters, null, 2);
+            const dataBlob = new Blob([dataStr], { type: 'application/json' });
+            const url = URL.createObjectURL(dataBlob);
+            
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = 'filter_configuration.json';
+            link.click();
+            
+            URL.revokeObjectURL(url);
+        }
+
+        // Programmatic filter management functions
+        function findFilterByDisplayName(displayName) {
+            return SAMPLE_FILTERS.findIndex(filter => filter.displayName === displayName);
+        }
+
+        function setFilterValue(displayName, value, operator = null) {
+            const filterIndex = findFilterByDisplayName(displayName);
+            if (filterIndex === -1) {
+                console.error(`Filter with displayName "${displayName}" not found`);
+                return false;
+            }
+
+            const filter = SAMPLE_FILTERS[filterIndex];
+            
+            try {
+                // Set operator if provided and available
+                if (operator && filter.operators && filter.operators.includes(operator)) {
+                    const operatorElement = document.getElementById(`operator_${filterIndex}`);
+                    if (operatorElement) {
+                        operatorElement.value = operator;
+                    }
+                }
+
+                // Set value based on control type
+                switch (filter.controlType) {
+                    case 'TEXT_INPUT':
+                        const textInput = document.getElementById(`value_${filterIndex}`);
+                        if (textInput) {
+                            textInput.value = value;
+                        }
+                        break;
+                    
+                    case 'NUMBER_RANGE':
+                        if (typeof value === 'object' && value !== null) {
+                            const minInput = document.getElementById(`min_${filterIndex}`);
+                            const maxInput = document.getElementById(`max_${filterIndex}`);
+                            if (minInput && value.min !== undefined) minInput.value = value.min;
+                            if (maxInput && value.max !== undefined) maxInput.value = value.max;
+                        } else {
+                            // If single value provided, set as min
+                            const minInput = document.getElementById(`min_${filterIndex}`);
+                            if (minInput) minInput.value = value;
+                        }
+                        break;
+                    
+                    case 'DATE_RANGE':
+                        if (typeof value === 'object' && value !== null) {
+                            const startInput = document.getElementById(`start_date_${filterIndex}`);
+                            const endInput = document.getElementById(`end_date_${filterIndex}`);
+                            if (startInput && value.start) startInput.value = value.start;
+                            if (endInput && value.end) endInput.value = value.end;
+                        } else {
+                            // If single date provided, set as start date
+                            const startInput = document.getElementById(`start_date_${filterIndex}`);
+                            if (startInput) startInput.value = value;
+                        }
+                        break;
+                    
+                    case 'CHECKBOX':
+                        // Clear all checkboxes first
+                        if (filter.options) {
+                            filter.options.forEach(option => {
+                                const checkbox = document.getElementById(`option_${filterIndex}_${option}`);
+                                if (checkbox) checkbox.checked = false;
+                            });
+                            
+                            // Set selected options
+                            const selectedOptions = Array.isArray(value) ? value : [value];
+                            selectedOptions.forEach(option => {
+                                const checkbox = document.getElementById(`option_${filterIndex}_${option}`);
+                                if (checkbox && filter.options.includes(option)) {
+                                    checkbox.checked = true;
+                                }
+                            });
+                        }
+                        break;
+                }
+                
+                console.log(`Filter "${displayName}" set successfully`);
+                return true;
+            } catch (error) {
+                console.error(`Error setting filter "${displayName}":`, error);
+                return false;
+            }
+        }
+
+        function getFilterValue(displayName) {
+            const filterIndex = findFilterByDisplayName(displayName);
+            if (filterIndex === -1) {
+                console.error(`Filter with displayName "${displayName}" not found`);
+                return null;
+            }
+
+            const filter = SAMPLE_FILTERS[filterIndex];
+            const result = {
+                displayName: displayName,
+                type: filter.type,
+                controlType: filter.controlType
+            };
+
+            // Get operator
+            const operatorElement = document.getElementById(`operator_${filterIndex}`);
+            if (operatorElement) {
+                result.operator = operatorElement.value;
+            }
+
+            // Get value based on control type
+            switch (filter.controlType) {
+                case 'TEXT_INPUT':
+                    const textInput = document.getElementById(`value_${filterIndex}`);
+                    result.value = textInput ? textInput.value : null;
+                    break;
+                
+                case 'NUMBER_RANGE':
+                    const minInput = document.getElementById(`min_${filterIndex}`);
+                    const maxInput = document.getElementById(`max_${filterIndex}`);
+                    result.value = {
+                        min: minInput ? (minInput.value ? parseFloat(minInput.value) : null) : null,
+                        max: maxInput ? (maxInput.value ? parseFloat(maxInput.value) : null) : null
+                    };
+                    break;
+                
+                case 'DATE_RANGE':
+                    const startInput = document.getElementById(`start_date_${filterIndex}`);
+                    const endInput = document.getElementById(`end_date_${filterIndex}`);
+                    result.value = {
+                        start: startInput ? startInput.value : null,
+                        end: endInput ? endInput.value : null
+                    };
+                    break;
+                
+                case 'CHECKBOX':
+                    if (filter.options) {
+                        const selected = [];
+                        filter.options.forEach(option => {
+                            const checkbox = document.getElementById(`option_${filterIndex}_${option}`);
+                            if (checkbox && checkbox.checked) {
+                                selected.push(option);
+                            }
+                        });
+                        result.value = selected;
+                    }
+                    break;
+            }
+
+            return result;
+        }
+
+        function clearFilter(displayName) {
+            const filterIndex = findFilterByDisplayName(displayName);
+            if (filterIndex === -1) {
+                console.error(`Filter with displayName "${displayName}" not found`);
+                return false;
+            }
+
+            const filter = SAMPLE_FILTERS[filterIndex];
+
+            // Clear based on control type
+            switch (filter.controlType) {
+                case 'TEXT_INPUT':
+                    const textInput = document.getElementById(`value_${filterIndex}`);
+                    if (textInput) textInput.value = '';
+                    break;
+                
+                case 'NUMBER_RANGE':
+                    const minInput = document.getElementById(`min_${filterIndex}`);
+                    const maxInput = document.getElementById(`max_${filterIndex}`);
+                    if (minInput) minInput.value = '';
+                    if (maxInput) maxInput.value = '';
+                    break;
+                
+                case 'DATE_RANGE':
+                    const startInput = document.getElementById(`start_date_${filterIndex}`);
+                    const endInput = document.getElementById(`end_date_${filterIndex}`);
+                    if (startInput) startInput.value = '';
+                    if (endInput) endInput.value = '';
+                    break;
+                
+                case 'CHECKBOX':
+                    if (filter.options) {
+                        filter.options.forEach(option => {
+                            const checkbox = document.getElementById(`option_${filterIndex}_${option}`);
+                            if (checkbox) checkbox.checked = false;
+                        });
+                    }
+                    break;
+            }
+
+            console.log(`Filter "${displayName}" cleared successfully`);
+            return true;
+        }
+
+        function setMultipleFilters(filterConfigs) {
+            const results = [];
+            filterConfigs.forEach(config => {
+                const success = setFilterValue(config.displayName, config.value, config.operator);
+                results.push({
+                    displayName: config.displayName,
+                    success: success
+                });
+            });
+            return results;
+        }
+
+        function getAllFilterNames() {
+            return SAMPLE_FILTERS.map(filter => filter.displayName);
+        }
+
+        // Make functions globally available
+        window.filterAPI = {
+            setFilterValue,
+            getFilterValue,
+            clearFilter,
+            setMultipleFilters,
+            getAllFilterNames,
+            findFilterByDisplayName
+        };
+
+        // Initialize the interface
+        document.addEventListener('DOMContentLoaded', function() {
+            renderFilters();
+            
+            // Example usage in console
+            console.log('Filter API готов! Примеры использования:');
+            console.log('filterAPI.setFilterValue("Client First Name", "John", "EQUALS")');
+            console.log('filterAPI.setFilterValue("Client Age", {min: 25, max: 65})');
+            console.log('filterAPI.setFilterValue("Marital Status", ["Single", "Married"])');
+            console.log('filterAPI.getFilterValue("Client First Name")');
+            console.log('filterAPI.clearFilter("Client First Name")');
+            console.log('filterAPI.getAllFilterNames()');
+        });
+    </script>
+</body>
+</html>
