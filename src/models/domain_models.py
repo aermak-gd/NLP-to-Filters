@@ -27,9 +27,9 @@ class ActiveFilter:
     """A filter ready to be applied"""
     filter_id: str
     filter_name: str
-    description: str
-    operator: str  # From filter metadata, not enum
-    value: Any
+    description: str = ""
+    operator: str = ""  # From filter metadata, not enum
+    value: Any = None
 
 @dataclass
 class FilterSuggestion:

@@ -603,10 +603,11 @@
             
             SAMPLE_FILTERS.forEach((filter, index) => {
                 const filterData = {
-                    displayName: filter.displayName,
-                    type: filter.type,
-                    controlType: filter.controlType,
-                    category: filter.category
+                    filter_id: filter.displayName,  // Using displayName as filter_id
+                    filter_name: filter.displayName,
+                    description: "",
+                    operator: "",
+                    value: null
                 };
 
                 // Get operator
@@ -631,7 +632,7 @@
                         const minValue = document.getElementById(`min_${index}`).value;
                         const maxValue = document.getElementById(`max_${index}`).value;
                         if (minValue || maxValue) {
-                            filterData.range = {
+                            filterData.value = {
                                 min: minValue ? parseFloat(minValue) : null,
                                 max: maxValue ? parseFloat(maxValue) : null
                             };
@@ -643,7 +644,7 @@
                         const startDate = document.getElementById(`start_date_${index}`).value;
                         const endDate = document.getElementById(`end_date_${index}`).value;
                         if (startDate || endDate) {
-                            filterData.dateRange = {
+                            filterData.value = {
                                 start: startDate || null,
                                 end: endDate || null
                             };
@@ -661,7 +662,7 @@
                                 }
                             });
                             if (selected.length > 0) {
-                                filterData.selectedOptions = selected;
+                                filterData.value = selected;
                                 hasValue = true;
                             }
                         }
@@ -673,6 +674,7 @@
                 }
             });
 
+            console.log('Sending active filters:', activeFilters);
             return activeFilters;
         }
 
@@ -737,14 +739,18 @@
             return SAMPLE_FILTERS.findIndex(filter => filter.displayName === displayName);
         }
 
-        function setFilterValue(displayName, value, operator = null) {
-            const filterIndex = findFilterByDisplayName(displayName);
+        function setFilterValue(filter_name, value, operator = null) {
+            console.log('setFilterValue called with:', { filter_name, value, operator });
+            const filterIndex = findFilterByDisplayName(filter_name);
+            console.log('Found filter index:', filterIndex);
+            
             if (filterIndex === -1) {
-                console.error(`Filter with displayName "${displayName}" not found`);
+                console.error(`Filter with name "${filter_name}" not found`);
                 return false;
             }
 
             const filter = SAMPLE_FILTERS[filterIndex];
+            console.log('Found filter:', filter);
             
             try {
                 // Set operator if provided and available
@@ -752,6 +758,7 @@
                     const operatorElement = document.getElementById(`operator_${filterIndex}`);
                     if (operatorElement) {
                         operatorElement.value = operator;
+                        console.log('Set operator to:', operator);
                     }
                 }
 
@@ -761,6 +768,7 @@
                         const textInput = document.getElementById(`value_${filterIndex}`);
                         if (textInput) {
                             textInput.value = value;
+                            console.log('Set text input value to:', value);
                         }
                         break;
                     
@@ -768,12 +776,21 @@
                         if (typeof value === 'object' && value !== null) {
                             const minInput = document.getElementById(`min_${filterIndex}`);
                             const maxInput = document.getElementById(`max_${filterIndex}`);
-                            if (minInput && value.min !== undefined) minInput.value = value.min;
-                            if (maxInput && value.max !== undefined) maxInput.value = value.max;
+                            if (minInput && value.min !== undefined) {
+                                minInput.value = value.min;
+                                console.log('Set min value to:', value.min);
+                            }
+                            if (maxInput && value.max !== undefined) {
+                                maxInput.value = value.max;
+                                console.log('Set max value to:', value.max);
+                            }
                         } else {
                             // If single value provided, set as min
                             const minInput = document.getElementById(`min_${filterIndex}`);
-                            if (minInput) minInput.value = value;
+                            if (minInput) {
+                                minInput.value = value;
+                                console.log('Set single value to:', value);
+                            }
                         }
                         break;
                     
@@ -781,12 +798,21 @@
                         if (typeof value === 'object' && value !== null) {
                             const startInput = document.getElementById(`start_date_${filterIndex}`);
                             const endInput = document.getElementById(`end_date_${filterIndex}`);
-                            if (startInput && value.start) startInput.value = value.start;
-                            if (endInput && value.end) endInput.value = value.end;
+                            if (startInput && value.start) {
+                                startInput.value = value.start;
+                                console.log('Set start date to:', value.start);
+                            }
+                            if (endInput && value.end) {
+                                endInput.value = value.end;
+                                console.log('Set end date to:', value.end);
+                            }
                         } else {
                             // If single date provided, set as start date
                             const startInput = document.getElementById(`start_date_${filterIndex}`);
-                            if (startInput) startInput.value = value;
+                            if (startInput) {
+                                startInput.value = value;
+                                console.log('Set single date to:', value);
+                            }
                         }
                         break;
                     
@@ -800,20 +826,22 @@
                             
                             // Set selected options
                             const selectedOptions = Array.isArray(value) ? value : [value];
+                            console.log('Setting checkbox options:', selectedOptions);
                             selectedOptions.forEach(option => {
                                 const checkbox = document.getElementById(`option_${filterIndex}_${option}`);
                                 if (checkbox && filter.options.includes(option)) {
                                     checkbox.checked = true;
+                                    console.log('Checked option:', option);
                                 }
                             });
                         }
                         break;
                 }
                 
-                console.log(`Filter "${displayName}" set successfully`);
+                console.log(`Filter "${filter_name}" set successfully`);
                 return true;
             } catch (error) {
-                console.error(`Error setting filter "${displayName}":`, error);
+                console.error(`Error setting filter "${filter_name}":`, error);
                 return false;
             }
         }
@@ -927,9 +955,9 @@
         function setMultipleFilters(filterConfigs) {
             const results = [];
             filterConfigs.forEach(config => {
-                const success = setFilterValue(config.displayName, config.value, config.operator);
+                const success = setFilterValue(config.filter_name, config.value, config.operator);
                 results.push({
-                    displayName: config.displayName,
+                    displayName: config.filter_name,
                     success: success
                 });
             });
@@ -956,6 +984,12 @@
 
             try {
                 const activeFilters = getFilterValues();
+                console.log('Sending request with:', {
+                    query: query,
+                    active_filters: activeFilters,
+                    session_id: "123"
+                });
+
                 const response = await fetch('http://localhost:5001/api/chat', {
                     method: 'POST',
                     headers: {
@@ -973,15 +1007,36 @@
                 }
 
                 const data = await response.json();
+                console.log('Received response:', data);
                 
                 // Clear all existing filters first
+                console.log('Clearing all existing filters');
                 clearFilters();
                 
                 // Apply the new filters from the response
                 if (data.active_filters && data.active_filters.length > 0) {
+                    console.log('Applying new filters:', data.active_filters);
                     data.active_filters.forEach(filter => {
-                        setFilterValue(filter.filter_name, filter.value, filter.operator);
+                        console.log('Processing filter:', filter);
+                        // Find the filter in SAMPLE_FILTERS by filter_id (which is displayName) or filter_name
+                        const sampleFilter = SAMPLE_FILTERS.find(f => 
+                            f.displayName === filter.filter_id || 
+                            f.displayName === filter.filter_name
+                        );
+                        console.log('Found matching sample filter:', sampleFilter);
+                        if (sampleFilter) {
+                            console.log('Setting filter value:', {
+                                filter_id: filter.filter_id || filter.filter_name,
+                                value: filter.value,
+                                operator: filter.operator
+                            });
+                            setFilterValue(filter.filter_id || filter.filter_name, filter.value, filter.operator);
+                        } else {
+                            console.warn('No matching filter found for:', filter.filter_id || filter.filter_name);
+                        }
                     });
+                } else {
+                    console.log('No filters to apply in response');
                 }
 
                 // Show the message from the response
